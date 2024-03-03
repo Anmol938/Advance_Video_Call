@@ -55,7 +55,8 @@ const register = async(req, res)=>{
 
     try {
 
-        var isUser = await User.findOne({name: {$regex: req.body.name, $options: 'ig'} });
+        var isUser = await User.findOne({ name: new RegExp(req.body.name, 'i') });
+
         if(isUser){
             res.render('register',{ success:false,message: 'This User Name ('+req.body.name+') is already exists!' });
         }
@@ -75,7 +76,7 @@ const register = async(req, res)=>{
         }
         
     } catch (error) {
-        console.log(error.message);
+        console.log("yha hai dikkaat" + error.message);
     }
 
 }
