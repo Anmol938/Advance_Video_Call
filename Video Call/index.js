@@ -22,3 +22,26 @@ app.use(express.static('public'));
 
 const userRoute = require('./routes/userRoute');
 app.use('/',userRoute);
+
+
+//wbesocket code
+var webSocketServ = require('ws').Server;
+var wss = new webSocketServ({
+    port:8000
+});
+
+wss.on("connection", function(conn){
+    console.log('User Connected');
+    conn.on("message", function(message){
+
+    });
+
+    conn.on("close", function(){
+        console.log("connection Closed");
+    });
+
+});
+
+function sendToOtherUser(connection, message ){
+    connection.send(JSON.stringify(message));
+}
