@@ -30,9 +30,34 @@ var wss = new webSocketServ({
     port:8000
 });
 
+var users = {};
 wss.on("connection", function(conn){
     console.log('User Connected');
     conn.on("message", function(message){
+       
+        var data;
+        try{
+            data = JSON.parse(message);
+        }
+        catch(error){
+            console.log(error);
+        }
+
+        switch(data.type)
+        {
+            case "online":
+                    users[data.name] = conn;
+                    conn.name = data;
+
+                    sendToOtherUser(conn, {
+                        type: 'online',
+                        success: true
+                    })
+            break;
+
+        }
+
+
 
     });
 
