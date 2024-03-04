@@ -10,7 +10,10 @@ connection.onmessage = function(msg){
          case "online":
                 onlineProcess(data.success);
                 console.log(data);
-                break;            
+                break;     
+         case "offer":
+                offerProcess(data.offer, data.name);             
+                break; 
         }
 }
 
@@ -112,4 +115,9 @@ function onlineProcess(success){
     }
 }
 
+function offerProcess(offer, name){
+    connectedUser = name;
+    console.log(connectedUser);
+    myConn.setRemoteDescription(new RTCSessionDescription(offer));
 
+}
