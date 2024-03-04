@@ -12,8 +12,15 @@ connection.onmessage = function(msg){
                 console.log(data);
                 break;     
          case "offer":
+                call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="/images/user.jpg" class="caller-image circle" alt=""> </div> <div class="user-name">Unknown User</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-accept"><i class="material-icons green darken-2 white-text audio-icon">call</i></div> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';
                 offerProcess(data.offer, data.name);             
                 break; 
+         case "answer":
+                    answerProcess(data.answer);             
+                    break;
+         case "candidate":
+                    candidateProcess(data.candidate);             
+                    break;                        
         }
 }
 
@@ -28,6 +35,7 @@ var local_video = document.querySelector('#local-video');
 
 var call_to_username_input = document.querySelector('#username-input');
 var call_btn = document.querySelector('#call-btn');
+var call_status = document.querySelector('.call-hang-status');
 
 call_btn.addEventListener("click", function(){
         var call_to_username = call_to_username_input.value;
@@ -104,6 +112,15 @@ function onlineProcess(success){
                 });
 
                 myConn.addStream(stream);
+
+                myConn.onicecandidate = function(event){
+                    if(event.candidate){
+                        send({
+                            type: "candidate",
+                            candidate: event.candidate
+                        })
+                    }
+                }
             },
             function(error){
                 alert("You can't access media");
@@ -117,7 +134,26 @@ function onlineProcess(success){
 
 function offerProcess(offer, name){
     connectedUser = name;
-    console.log(connectedUser);
+    console.log("here uou go"+connectedUser.name);
     myConn.setRemoteDescription(new RTCSessionDescription(offer));
+   // alert("Following user wants to connect with you" +connectedUser.name);
+    //create answer to an offer or first user
+    myConn.createAnswer(function(answer){
+        myConn.setLocalDescription(answer);
+        send({
+            type: "answer",
+            answer: answer
+        });
+    }, function(error){
+        alert("Answer has not been created");
+    });
+}
 
+function answerProcess(answer){
+    myConn.setRemoteDescription(new RTCSessionDescription(answer));
+
+}
+
+function candidateProcess(candidate){
+    myConn.addIceCandidate(new RTCIceCandidate(candidate));
 }
