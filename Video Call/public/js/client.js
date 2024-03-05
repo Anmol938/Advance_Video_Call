@@ -12,13 +12,26 @@ connection.onmessage = function(msg){
                 console.log(data);
                 break;     
          case "not available":
+                call_status.innerHTML= '';
                 alert(data.name+ ' user not available');
                 call_btn.removeAttribute("disabled");
                 break;       
          case "offer":
                 call_btn.setAttribute("disabled","disabled");
                 call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="'+data.image+'" class="caller-image circle" alt=""> </div> <div class="user-name">'+data.name.name+'</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-accept"><i class="material-icons green darken-2 white-text audio-icon">call</i></div> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';
-                offerProcess(data.offer, data.name);             
+                var call_accept = document.querySelector('.call-accept');
+                var call_reject = document.querySelector('.call-reject');
+                
+                call_accept.addEventListener("click", function(){
+                    offerProcess(data.offer, data.name);
+                    call_status.innerHTML = '';    
+                });
+                
+                call_reject.addEventListener("click", function(){
+                    call_status.innerHTML = '';    
+                    alert('Call is rejected');
+                    call_btn.removeAttribute("disabled");
+                });
                 break; 
          case "answer":
                     answerProcess(data.answer);             
@@ -51,7 +64,16 @@ call_btn.addEventListener("click", function(){
                 alert("You can't call yourself");
             }
             else{
-                         
+            call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="/images/user.jpg" class="caller-image circle" alt=""> </div> <div class="user-name">unknown user</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"><div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';             
+           
+            var call_reject = document.querySelector('.call-reject');
+            
+            call_reject.addEventListener("click", function(){
+                call_status.innerHTML = '';    
+                alert('Call is rejected');
+                call_btn.removeAttribute("disabled");
+            });
+
             call_btn.setAttribute("disabled","disabled");        
             myConn.createOffer(function(offer){
                 send({
