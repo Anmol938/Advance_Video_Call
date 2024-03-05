@@ -63,7 +63,14 @@ wss.on("connection", function(conn){
                     sendToOtherUser(connect,{
                         type: "offer",
                         offer: data.offer,
-                        name: conn.name
+                        name: conn.name,
+                        image: data.image
+                    });
+                  }
+                  else{
+                    sendToOtherUser(conn,{
+                        type: "not available",
+                        name: data.name,
                     });
                   }
                   break;  

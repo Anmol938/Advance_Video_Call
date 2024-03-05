@@ -11,8 +11,13 @@ connection.onmessage = function(msg){
                 onlineProcess(data.success);
                 console.log(data);
                 break;     
+         case "not available":
+                alert(data.name+ ' user not available');
+                call_btn.removeAttribute("disabled");
+                break;       
          case "offer":
-                call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="/images/user.jpg" class="caller-image circle" alt=""> </div> <div class="user-name">Unknown User</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-accept"><i class="material-icons green darken-2 white-text audio-icon">call</i></div> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';
+                call_btn.setAttribute("disabled","disabled");
+                call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="'+data.image+'" class="caller-image circle" alt=""> </div> <div class="user-name">'+data.name.name+'</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-accept"><i class="material-icons green darken-2 white-text audio-icon">call</i></div> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';
                 offerProcess(data.offer, data.name);             
                 break; 
          case "answer":
@@ -42,15 +47,23 @@ call_btn.addEventListener("click", function(){
         if(call_to_username.length > 0 )
         {
             connectedUser = call_to_username.toLowerCase();
+            if(username == connectedUser){
+                alert("You can't call yourself");
+            }
+            else{
+                         
+            call_btn.setAttribute("disabled","disabled");        
             myConn.createOffer(function(offer){
                 send({
                     type:"offer",
-                    offer: offer
+                    offer: offer,
+                    image:userImage
                 });
                 myConn.setLocalDescription(offer);
             },function(){
                 alert("Offer has not been created!");
             });
+            }
         }
         else{
             alert("Please enter username");
@@ -82,6 +95,7 @@ setTimeout(function(){
 function send(message){
     if(connectedUser){
         message.name = connectedUser;
+        
     }
     connection.send(JSON.stringify(message));
 }
