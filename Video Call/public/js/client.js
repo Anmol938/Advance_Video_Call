@@ -65,7 +65,7 @@ call_btn.addEventListener("click", function(){
             }
             else{
             call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="/images/user.jpg" class="caller-image circle" alt=""> </div> <div class="user-name">unknown user</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"><div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';             
-           
+            setUserProfile(connectedUser);
             var call_reject = document.querySelector('.call-reject');
             
             call_reject.addEventListener("click", function(){
@@ -192,4 +192,25 @@ function answerProcess(answer){
 
 function candidateProcess(candidate){
     myConn.addIceCandidate(new RTCIceCandidate(candidate));
+}
+
+function setUserProfile(name){
+    var  xhtr = new XMLHttpRequest();
+    xhtr.open("GET","/get-user-profile?name="+name, true);
+    xhtr.send(); 
+
+    xhtr.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            console.log(this.responseText);
+            var obj = JSON.parse(this.responseText);
+            if(obj.success){
+              var data = obj.data;
+              var caller_image =   document.querySelector('.caller-image');
+              var user_name =  document.querySelector('.user-name');
+
+              caller_image.setAttribute('src', data.image);
+              user_name.innerHTML = data.name;
+            }
+        }
+    }
 }
