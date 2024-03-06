@@ -105,11 +105,29 @@ const logout = async(req, res) =>{
     }
 }
 
+const getUserProfile = async(req, res) =>{
+    try {
+        var user = await User.findOne({ name: new RegExp(req.query.name, 'i') });
+        if(user){
+            res.send({success: true, data:user });
+        }    
+        else{
+            res.send({success: false, msg: 'User not found'});
+        }
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+
 module.exports = {
     loadLogin,
     loadRegister,
     loadHome,
     register,
     login,
-    logout
+    logout,
+    getUserProfile
 }

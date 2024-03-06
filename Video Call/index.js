@@ -92,7 +92,22 @@ wss.on("connection", function(conn){
                         candidate: data.candidate
                     });
                   }
-                break;      
+                break;   
+            case "reject":
+                    var connect = users[data.name.name];
+                    //
+                    console.log(data.name);
+                    console.log(data.name.name);
+                    console.log("inside reject switch on server side" + "value of connect-->" + connect);
+                    //
+                    if(connect != null){
+                      sendToOtherUser(connect, {
+                          type: "reject",
+                          name: conn.name
+                      });
+                    }
+                  break;      
+         
 
         }
 

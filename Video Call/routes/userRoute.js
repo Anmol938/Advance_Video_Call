@@ -32,4 +32,6 @@ router.post('/register',upload.single('image'), auth.isLogout,userController.reg
 router.get('/home', auth.isLogin,userController.loadHome);
 router.get('/logout', auth.isLogin,userController.logout);
 
+router.get('/get-user-profile', auth.isLogin, userController.getUserProfile);
+
 module.exports = router;

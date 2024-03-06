@@ -12,20 +12,40 @@ connection.onmessage = function(msg){
                 console.log(data);
                 break;     
          case "not available":
+                call_status.innerHTML='';
                 alert(data.name+ ' user not available');
                 call_btn.removeAttribute("disabled");
                 break;       
          case "offer":
                 call_btn.setAttribute("disabled","disabled");
                 call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="'+data.image+'" class="caller-image circle" alt=""> </div> <div class="user-name">'+data.name.name+'</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-accept"><i class="material-icons green darken-2 white-text audio-icon">call</i></div> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';
-                offerProcess(data.offer, data.name);             
+                offerProcess(data.offer, data.name);  
+                
+                var call_accept = document.querySelector('.call-accept');
+                var call_reject = document.querySelector('.call-reject');
+
+                call_accept.addEventListener("click", function(){
+                    offerProcess(data.offer, data.name);
+                    call_status.innerHTML = '';    
+                });
+
+                call_reject.addEventListener("click", function(){
+                    call_status.innerHTML = '';    
+                    alert('Call is rejected');
+                    call_btn.removeAttribute("disabled");
+
+                    rejectedCall(data.name);
+                });
                 break; 
          case "answer":
                     answerProcess(data.answer);             
                     break;
          case "candidate":
                     candidateProcess(data.candidate);             
-                    break;                        
+                    break;  
+         case "reject":
+                    rejectProcess();             
+                    break;                                 
         }
 }
 
@@ -51,7 +71,19 @@ call_btn.addEventListener("click", function(){
                 alert("You can't call yourself");
             }
             else{
-                         
+            call_status.innerHTML='<div class="calling-status-wrap card black white-text"> <div class="user-image"> <img src="/images/user.jpg" class="caller-image circle" alt=""> </div> <div class="user-name">Unknown User</div> <div class="user-calling-status">Calling...</div> <div class="calling-action"> <div class="call-reject"><i class="material-icons red darken-3 white-text close-icon">close</i></div> </div> </div>';             
+            setUserProfile(connectedUser);    
+            var call_reject = document.querySelector('.call-reject');
+
+            call_reject.addEventListener("click", function(){
+                call_status.innerHTML = '';    
+                alert('Call is rejected');
+                call_btn.removeAttribute("disabled");
+                console.log("button clicked for call is rejected ----- before rejectedCall method is called");   
+                rejectedCall(connectedUser);
+                console.log("button clicked for call is rejected ----- after rejectedCall method is called");
+
+            });    
             call_btn.setAttribute("disabled","disabled");        
             myConn.createOffer(function(offer){
                 send({
@@ -170,4 +202,46 @@ function answerProcess(answer){
 
 function candidateProcess(candidate){
     myConn.addIceCandidate(new RTCIceCandidate(candidate));
+}
+
+
+function setUserProfile(name){
+        var xhtr = new XMLHttpRequest();
+        xhtr.open("GET","/get-user-profile?name="+name, true);
+        xhtr.send();
+
+        xhtr.onreadystatechange = function(){
+            if( this.readyState == 4 && this.status == 200){
+                console.log(this.responseText);
+               var obj =  JSON.parse(this.responseText);
+                
+               if(obj.success){
+                var data = obj.data;
+               var caller_image =  document.querySelector('.caller-image');
+               var user_name =  document.querySelector('.user-name');
+
+               caller_image.setAttribute('src',data.image);
+               user_name.innerHTML = data.name;
+               }
+            }
+        };
+}
+
+function rejectedCall(rejected_user)
+{   
+    console.log("inside rejecetd call method");
+    send(
+        {
+            type: "reject",
+            name: rejected_user
+        }
+    );
+
+}
+
+function rejectProcess()
+{
+    call_status.innerHTML='';
+    call_btn.removeAttribute("disabled");
+    
 }
