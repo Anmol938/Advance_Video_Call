@@ -27,6 +27,7 @@ connection.onmessage = function(msg){
                 call_accept.addEventListener("click", function(){
                     offerProcess(data.offer, data.name);
                     call_status.innerHTML = '';    
+                    acceptCall(data.name);
                 });
 
                 call_reject.addEventListener("click", function(){
@@ -45,7 +46,10 @@ connection.onmessage = function(msg){
                     break;  
          case "reject":
                     rejectProcess();             
-                    break;                                 
+                    break;
+         case "accept":
+                    acceptProcess();
+                    break;                                            
         }
 }
 
@@ -244,4 +248,16 @@ function rejectProcess()
     call_status.innerHTML='';
     call_btn.removeAttribute("disabled");
     
+}
+
+function acceptCall(call_name){
+    send({
+        type: "accept",
+        name: call_name
+    })
+}
+
+
+function acceptProcess(){
+    call_status.innerHTML = '';
 }
